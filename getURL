@@ -1,0 +1,13 @@
+#!/usr/bin/python
+# -*- coding: utf_8 -*-
+import urllib
+import urllib2
+url_utf8 = "http://en.wikipedia.org/wiki/Paul_Erdős"
+url_encoded = "http://en.wikipedia.org/wiki/Paul_Erd%C5%91s"
+result = urllib2.urlopen(url_utf8)
+source = result.read()
+
+f = open(urllib.unquote('Paul_Erd%C5%91s'),"w")
+f.write(urllib.unquote(url_encoded)+"\n\n\n")
+f.write(source)
+f.close()
