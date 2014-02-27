@@ -680,7 +680,6 @@ There are 789 links in dic_wikipedia_en_links:
 /wiki/Foundationalism : 1
 /wiki/Positivism : 1
 /wiki/Ivan_Pavlov : 1
-/wiki/Chen_Ning_Yang : 1
 /wiki/Personal_god : 1
 /wiki/Johannes_Diderik_van_der_Waals : 1
 /wiki/Principle_of_relativity : 1
@@ -690,6 +689,7 @@ There are 789 links in dic_wikipedia_en_links:
 /wiki/Models_of_scientific_inquiry : 1
 /wiki/Wolfgang_Ketterle : 1
 /wiki/George_E._Smith : 1
+/wiki/Chen-Ning_Yang : 1
 /wiki/Carlo_Rubbia : 1
 /wiki/Second_quantization : 1
 /wiki/Horace_Lamb : 1
@@ -1483,7 +1483,6 @@ Ranked dic_wikipedia_en_links are:
 /wiki/Foundationalism : 1
 /wiki/Positivism : 1
 /wiki/Ivan_Pavlov : 1
-/wiki/Chen_Ning_Yang : 1
 /wiki/Personal_god : 1
 /wiki/Johannes_Diderik_van_der_Waals : 1
 /wiki/Principle_of_relativity : 1
@@ -1493,6 +1492,7 @@ Ranked dic_wikipedia_en_links are:
 /wiki/Models_of_scientific_inquiry : 1
 /wiki/Wolfgang_Ketterle : 1
 /wiki/George_E._Smith : 1
+/wiki/Chen-Ning_Yang : 1
 /wiki/Carlo_Rubbia : 1
 /wiki/Second_quantization : 1
 /wiki/Horace_Lamb : 1

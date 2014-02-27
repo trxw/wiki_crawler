@@ -46,6 +46,7 @@ from collections import Counter
 url = "http://en.wikipedia.org/wiki/Mathematics"
 # Undesirable links:
 UNDESIRABLE_LINKS = [ 
+	'digital_object_identifier',
 	'/w/index.php?title=event_(' # These two are to exclude possible  
 	################################ direct self-referral since it creates
 	################################ an infinite loop while crawling the
@@ -245,15 +246,22 @@ def get_end_link(data, start_link):
 	else:
 		return -1
 
-def store_link(dictionary, link):
-	"""Sort and store dic based on key, that is based on the number of 
-	referrals to each link stored in dic:
+def store_link_count(dictionary, link):
+	"""Store link in the dictionary in the (k, v) form with 
+	k = link.get_actual_link() and v += 1 for each new referral to that link in
+	the html file. At the end of html file v will be the total number of referrals 
+	to that link in the page.
+	
+	"""
 
-	""" 
-	if link not in dictionary:
-		dictionary[link] = 1
+#	dictionary[link.get_actual_link()] = {}
+
+	if link.get_actual_link() not in dictionary:
+#		dictionary[link.get_actual_link()]["Title"] = link.get 
+		dictionary[link.get_actual_link()] = 1
 	else:
-		dictionary[link] += 1
+		dictionary[link.get_actual_link()] += 1
+
 
 def sort_dic(dic):
 	"""Return a sorted disctionary based on integer values from largest 
@@ -483,6 +491,24 @@ class Link(object):  #='NOPARENTLINK'  default parent?
 	def set_wikipedia_page_topic(self):
 		self.page_topic = self.get_wikipedia_page_topic()		
 
+
+	@staticmethod
+	def extract_link_title(data, end_link):
+		"""Look for 'title="' keyword after the index of the last character of 
+		the link (end_link), and return the string starting from index after '"'
+		in 'title="' up to the next '"'.  
+
+		Note: This method gives wrong title (possibly title of the next tag) for 
+		a given href if the link is not checked to give True with is_good_link()
+		method first.
+	
+		"""
+		title_start_index = data.find('title="', end_link) + 7
+		if title_start_index != -1 + 7:
+			title_last_index = data.find('"',title_start_index) - 1
+			return data[title_start_index : title_last_index + 1]
+
+
 	def __repr__(self):
 		return self.get_link()
 
@@ -514,8 +540,9 @@ def get_links(data, given_url):
 		if start_link != -1:
 			link_count += 1
 			## Extract the link as string:      
-			current_link = Link(extract_link(data, start_link, end_link), url)
-			
+			if end_link != -1:
+				current_link = Link(extract_link(data, start_link, end_link), url)
+				current_link_title = Link.extract_link_title(data, end_link)
 			## and Store the extracted link inside list li:     
 			#   li.append(current_link)
 
@@ -524,31 +551,31 @@ def get_links(data, given_url):
 			if current_link.is_good_link(): #len(current_link.get_actual_link()) > 2:
 				if current_link.is_wikipedia_en_link():     
 					if current_link.is_wikipedia_template_or_category_link():
-						store_link(dic_wikipedia_template_or_category_links, current_link.get_actual_link())
+						store_link_count(dic_wikipedia_template_or_category_links, current_link)
    					#
    					#elif current_link.is_wikipedia_person():
-					#	store_link(dic_wikipedia_person_links, current_link.get_actual_link())
+					#	store_link_count(dic_wikipedia_person_links, current_link)
 					#
 					else:
-   						store_link(dic_wikipedia_en_links, current_link.get_actual_link())
+   						store_link_count(dic_wikipedia_en_links, current_link)
 					
 					#else:	
 				elif current_link.is_wikipedia_non_en_link():
-					store_link(dic_wikipedia_non_en_links, current_link.get_actual_link())
+					store_link_count(dic_wikipedia_non_en_links, current_link)
 
 				elif current_link.is_anchor_tag():
 					if current_link.is_cite_number():
-						store_link(dic_cite_numbers, current_link.get_actual_link())
+						store_link_count(dic_cite_numbers, current_link)
 					else: 
-						store_link(dic_section_anchor_links, current_link.get_actual_link())
+						store_link_count(dic_section_anchor_links, current_link)
   
 	
 				elif current_link.is_book_link():
-					store_link(dic_book_links, current_link.get_actual_link())
+					store_link_count(dic_book_links, current_link)
 				
 				
 				else:                           
-					store_link(dic_external_links, current_link.get_actual_link())
+					store_link_count(dic_external_links, current_link)
 	
 
 	return [dic_section_anchor_links, dic_external_links, dic_wikipedia_non_en_links, dic_cite_numbers, dic_book_links, dic_wikipedia_en_links, dic_wikipedia_person_links, dic_wikipedia_template_or_category_links]    
