@@ -359,7 +359,7 @@ class Link(object):  #='NOPARENTLINK'  default parent?
 		else:
 			return False
 
-	def is_wikipedia_internal_link(self):
+	def is_anchor_tag(self):
 		if self.get_link()[0:2].find('#') != -1:	
 			return True
 		
@@ -491,12 +491,12 @@ def get_links(data, given_url):
 	url = str(given_url)
 	end_link = 0
 	#li=[]
-	dic_internal_links = {}
+	dic_section_anchor_links = {}
 	dic_external_links = {}
 	dic_cite_numbers = {}
 	dic_wikipedia_non_en_links = {}
 	dic_book_links = {}
-	dic_wikipedia_links = {}
+	dic_wikipedia_en_links = {}
 	dic_wikipedia_person_links = {}
 	dic_wikipedia_template_or_category_links = {}
 	link_count = 0
@@ -530,17 +530,17 @@ def get_links(data, given_url):
 					#	store_link(dic_wikipedia_person_links, current_link.get_actual_link())
 					#
 					else:
-   						store_link(dic_wikipedia_links, current_link.get_actual_link())
+   						store_link(dic_wikipedia_en_links, current_link.get_actual_link())
 					
 					#else:	
 				elif current_link.is_wikipedia_non_en_link():
 					store_link(dic_wikipedia_non_en_links, current_link.get_actual_link())
 
-				elif current_link.is_wikipedia_internal_link():
+				elif current_link.is_anchor_tag():
 					if current_link.is_cite_number():
 						store_link(dic_cite_numbers, current_link.get_actual_link())
 					else: 
-						store_link(dic_internal_links, current_link.get_actual_link())
+						store_link(dic_section_anchor_links, current_link.get_actual_link())
   
 	
 				elif current_link.is_book_link():
@@ -551,7 +551,7 @@ def get_links(data, given_url):
 					store_link(dic_external_links, current_link.get_actual_link())
 	
 
-	return [dic_internal_links, dic_external_links, dic_wikipedia_non_en_links, dic_cite_numbers, dic_book_links, dic_wikipedia_links, dic_wikipedia_person_links, dic_wikipedia_template_or_category_links]    
+	return [dic_section_anchor_links, dic_external_links, dic_wikipedia_non_en_links, dic_cite_numbers, dic_book_links, dic_wikipedia_en_links, dic_wikipedia_person_links, dic_wikipedia_template_or_category_links]    
 
 url = Link("http://en.wikipedia.org/wiki/Albert_Einstein")
 
@@ -573,7 +573,7 @@ f = open(url.get_actual_link()[url.get_actual_link().find('wiki/')+5 : ]+".txt",
 
 wikipedia_links_sorted = sort_dic(dics_list[5])
 number_of_wikipedia_links = len(wikipedia_links_sorted)
-f.write("There are " + str(number_of_wikipedia_links) + " links in dic_wikipedia_links: \n") 
+f.write("There are " + str(number_of_wikipedia_links) + " links in dic_wikipedia_en_links: \n") 
 
 for i in range(len(wikipedia_links_sorted)):
 	f.write(str(wikipedia_links_sorted[i][0]) + " : " + str(wikipedia_links_sorted[i][1]) + "\n")   
@@ -592,13 +592,13 @@ for j in range(len(q)):
 f.write("\n\n\n\n\n\n")
 
 ## Write the dic_external_links:
-f.write("Ranked dic_wikipedia_links are: \n") 
+f.write("Ranked dic_wikipedia_en_links are: \n") 
 for i in range(len(t)):
 	f.write(str(t[i][0]) + " : " + str(t[i][1]) + "\n")
 
 f.write("\n\n\n\n\n\n")
 
-f.write("dic_internal_links are: \n") 
+f.write("dic_section_anchor_links are: \n") 
 for j in dics_list[0]:
 	f.write(str(j) + " : " + str(dics_list[0][j]) + "\n")    
 

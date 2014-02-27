@@ -1,4 +1,4 @@
-There are 789 links in dic_wikipedia_links: 
+There are 789 links in dic_wikipedia_en_links: 
 /wiki/Digital_object_identifier : 12
 /wiki/Bibcode : 11
 /wiki/Photoelectric_effect : 7
@@ -801,7 +801,7 @@ Ranked dic_wikipedia_person_links are:
 
 
 
-Ranked dic_wikipedia_links are: 
+Ranked dic_wikipedia_en_links are: 
 /wiki/Digital_object_identifier : 12
 /wiki/Bibcode : 11
 /wiki/Photoelectric_effect : 7
@@ -1597,7 +1597,7 @@ Ranked dic_wikipedia_links are:
 
 
 
-dic_internal_links are: 
+dic_section_anchor_links are: 
 #Collaboration_with_other_scientists : 1
 #Thermodynamic_fluctuations_and_statistical_physics : 1
 #Unified_field_theory : 1
