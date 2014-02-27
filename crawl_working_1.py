@@ -38,7 +38,7 @@ from collections import Counter
 # http://www.crummy.com/software/BeautifulSoup/bs4/doc/#installing-a-parser
 # Every website now has RESTful API - related to semantic web:
 # http://stackoverflow.com/questions/671118/what-exactly-is-restful-programming
-
+# Git good intro: http://git-scm.com/docs/gittutorial
 
 
 
@@ -353,13 +353,13 @@ class Link(object):  #='NOPARENTLINK'  default parent?
 		return self.actual_parent_link
 
 
-	def is_good_cite_number(self):
+	def is_cite_number(self):
 		if len(self.get_link()) > 4:
 			return self.get_link()[0:4].find('#cit') != -1
 		else:
 			return False
 
-	def is_good_internal_link(self):
+	def is_wikipedia_internal_link(self):
 		if self.get_link()[0:2].find('#') != -1:	
 			return True
 		
@@ -385,11 +385,11 @@ class Link(object):  #='NOPARENTLINK'  default parent?
 		return False
 
 
-	def is_wikipedia_link(self):
+	def is_wikipedia_en_link(self):
 		"""Return True if the link is a Wikipedia link. 
 
 		Note: is_good_link() must be checked BEFORE passing self.get_link() to 
-		is_wikipedia_link(), to ensure that it is not a robot.txt forbidden link in 
+		is_wikipedia_en_link(), to ensure that it is not a robot.txt forbidden link in 
 		wikipedia. There are numerous links forbidden to crawl on wikipedia that 
 		start with '/wiki/'. 
 
@@ -404,7 +404,7 @@ class Link(object):  #='NOPARENTLINK'  default parent?
 	def is_wikipedia_person(self):
 		"""Check if the argument refers to a page with persondata-label css file,
 		which means it is a person page. The argument to is_wikipedia_person() must
-		have been checked to return True with is_wikipedia_link(), that is it must 
+		have been checked to return True with is_wikipedia_en_link(), that is it must 
 		be a wikipedia link, which starts with /wiki/.
 
 		"""
@@ -522,7 +522,7 @@ def get_links(data, given_url):
 			## and Store the extracted link inside dictionary dic, and add 1 to the number of 
 			## occurrence of the link:
 			if current_link.is_good_link(): #len(current_link.get_actual_link()) > 2:
-				if current_link.is_wikipedia_link():     
+				if current_link.is_wikipedia_en_link():     
 					if current_link.is_wikipedia_template_or_category_link():
 						store_link(dic_wikipedia_template_or_category_links, current_link.get_actual_link())
    					#
@@ -536,8 +536,8 @@ def get_links(data, given_url):
 				elif current_link.is_wikipedia_non_en_link():
 					store_link(dic_wikipedia_non_en_links, current_link.get_actual_link())
 
-				elif current_link.is_good_internal_link():
-					if current_link.is_good_cite_number():
+				elif current_link.is_wikipedia_internal_link():
+					if current_link.is_cite_number():
 						store_link(dic_cite_numbers, current_link.get_actual_link())
 					else: 
 						store_link(dic_internal_links, current_link.get_actual_link())
