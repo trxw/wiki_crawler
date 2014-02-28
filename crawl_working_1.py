@@ -534,6 +534,48 @@ class Link(object):  #='NOPARENTLINK'  default parent?
 			title_last_index = data.find('"',title_start_index) - 1
 			return data[title_start_index : title_last_index + 1]
 
+	def store(self, dic_section_anchor_links,
+		dic_external_links,
+		dic_cite_numbers,
+		dic_wikipedia_non_en_links,
+		dic_book_links,
+		dic_wikipedia_en_links,
+		dic_wikipedia_person_links,
+		dic_wikipedia_template_or_category_links):
+		
+		if self.is_good_link(): #len(self.get_actual_link()) > 2:
+			if self.is_wikipedia_en_link():     
+				if self.is_wikipedia_template_or_category_link():
+					store_link_count(dic_wikipedia_template_or_category_links, self)
+   					#
+   					#elif self.is_wikipedia_person():
+					#	store_link_count(dic_wikipedia_person_links, self)
+					#
+				else:
+   					store_link_count(dic_wikipedia_en_links, self)
+					
+					#else:	
+			elif self.is_wikipedia_non_en_link():
+				store_link_count(dic_wikipedia_non_en_links, self)
+
+			elif self.is_anchor_tag():
+				if self.is_cite_number():
+					store_link_count(dic_cite_numbers, self)
+				else: 
+					store_link_count(dic_section_anchor_links, self)
+  
+	
+			elif self.is_book_link():
+					store_link_count(dic_book_links, self)
+				
+				
+			else:                           
+				store_link_count(dic_external_links, self)
+	
+
+		return [dic_section_anchor_links, dic_external_links, dic_wikipedia_non_en_links, dic_cite_numbers, dic_book_links, dic_wikipedia_en_links, dic_wikipedia_person_links, dic_wikipedia_template_or_category_links]    
+
+
 
 	def __repr__(self):
 		return self.get_link()
@@ -543,6 +585,8 @@ def get_links(data, given_url):
 	url = str(given_url)
 	end_link = 0
 	#li=[]
+	link_count = 0
+	start_link = 0
 	dic_section_anchor_links = {}
 	dic_external_links = {}
 	dic_cite_numbers = {}
@@ -551,8 +595,6 @@ def get_links(data, given_url):
 	dic_wikipedia_en_links = {}
 	dic_wikipedia_person_links = {}
 	dic_wikipedia_template_or_category_links = {}
-	link_count = 0
-	start_link = 0
 
 	#test_link = Link('/wiki/template:')
 
@@ -569,42 +611,28 @@ def get_links(data, given_url):
 			if end_link != -1:
 				current_link = Link(extract_link(data, start_link, end_link), url)
 				current_link_title = Link.extract_link_title(data, end_link)
-			## and Store the extracted link inside list li:     
-			#   li.append(current_link)
-
-			## and Store the extracted link inside dictionary dic, and add 1 to the number of 
-			## occurrence of the link:
-			if current_link.is_good_link(): #len(current_link.get_actual_link()) > 2:
-				if current_link.is_wikipedia_en_link():     
-					if current_link.is_wikipedia_template_or_category_link():
-						store_link_count(dic_wikipedia_template_or_category_links, current_link)
-   					#
-   					#elif current_link.is_wikipedia_person():
-					#	store_link_count(dic_wikipedia_person_links, current_link)
-					#
-					else:
-   						store_link_count(dic_wikipedia_en_links, current_link)
-					
-					#else:	
-				elif current_link.is_wikipedia_non_en_link():
-					store_link_count(dic_wikipedia_non_en_links, current_link)
-
-				elif current_link.is_anchor_tag():
-					if current_link.is_cite_number():
-						store_link_count(dic_cite_numbers, current_link)
-					else: 
-						store_link_count(dic_section_anchor_links, current_link)
-  
-	
-				elif current_link.is_book_link():
-					store_link_count(dic_book_links, current_link)
+				current_link.store(
+					dic_section_anchor_links,
+					dic_external_links,
+					dic_cite_numbers,
+					dic_wikipedia_non_en_links,
+					dic_book_links,
+					dic_wikipedia_en_links,
+					dic_wikipedia_person_links,
+					dic_wikipedia_template_or_category_links)		
 				
-				
-				else:                           
-					store_link_count(dic_external_links, current_link)
-	
 
-	return [dic_section_anchor_links, dic_external_links, dic_wikipedia_non_en_links, dic_cite_numbers, dic_book_links, dic_wikipedia_en_links, dic_wikipedia_person_links, dic_wikipedia_template_or_category_links]    
+	return [dic_section_anchor_links,
+				dic_external_links,
+				dic_cite_numbers,
+				dic_wikipedia_non_en_links,
+				dic_book_links,
+				dic_wikipedia_en_links,
+				dic_wikipedia_person_links,
+				dic_wikipedia_template_or_category_links,
+			] 
+
+
 
 url = Link("http://en.wikipedia.org/wiki/Sadness")
 
