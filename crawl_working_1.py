@@ -46,6 +46,9 @@ from Bad_links import UNDESIRABLE_LINKS, TEMPLATE_OR_CATEGORY, FILES, BAD_EXTENT
 # Now if we extract the graph of emotions from wikipedia, would we find some fundamental
 # emotions that all other emotions are connected to most frequently? 
 
+# People's biographies and recent talks about people:
+# http://en.wikipedia.org/wiki/Category_talk:Living_people
+
 
 ########################### To study#########################:
 #http://docs.python.org/2/library/urllib2.html
@@ -419,6 +422,10 @@ class Link(object):  #='NOPARENTLINK'  default parent?
 		return [dic_section_anchor_links, dic_external_links, dic_wikipedia_non_en_links, dic_cite_numbers, dic_book_links, dic_wikipedia_en_links, dic_wikipedia_person_links, dic_wikipedia_template_or_category_links]    
 
 	def get_links(self):
+		"""Get all the appropriate links that are referred to in the parsed html of the original url 
+		of the Link instance.
+
+		"""
 		data = self.get_html()
 		given_url = self.get_actual_link() 
 		url = str(given_url)
@@ -489,7 +496,7 @@ class Link(object):  #='NOPARENTLINK'  default parent?
 #########################################################################
 ################################Test#####################################
 
-url = Link("http://en.wikipedia.org/wiki/Sadness")
+url = Link("http://en.wikipedia.org/wiki/Category:Living_people")
 
 #html_data = url.get_html()
 dics_list = url.get_links()
