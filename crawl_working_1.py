@@ -5,6 +5,12 @@ import urllib
 import urllib2
 from collections import Counter
 
+#######################System Setup:########################
+# Installing mongodb for python:
+# http://api.mongodb.org/python/current/installation.html
+# How to use pymongo in python:  
+# http://api.mongodb.org/python/current/tutorial.html
+
 ######################Uresolved:############################
 
 #How python will count the number of charactes in a link if 
@@ -20,6 +26,7 @@ from collections import Counter
 # http://en.wikipedia.org/w/index.php?title=Category:1960_births&from=K
 # http://en.wikipedia.org/wiki/Wikipedia:Who_is_a_low_profile_individual
 # http://en.wikipedia.org/wiki/Category:Living_people
+# All wikipedia categories: http://en.wikipedia.org/wiki/Category:Commons_category_with_page_title_same_as_on_Wikidata
 # http://www.crummy.com/software/BeautifulSoup/bs4/doc/#installing-a-parser
 # requests: an alternative to urllib2 which is used by everyone nowedays according to themselves:
 # http://docs.python-requests.org/en/latest/
@@ -30,6 +37,11 @@ from collections import Counter
 # How to avoid non html content in http request:
 # http://stackoverflow.com/questions/8479736/using-python-urllib-how-to-avoid-non-html-content
 
+# Link emotions for A.I.. Look at the pages under the category emotions. This is what I was
+# looking for:
+# http://en.wikipedia.org/wiki/Category:Emotions
+# Now if we extract the graph of emotions from wikipedia, would we find some fundamental
+# emotions that all other emotions are connected to most frequently? 
 ########################### To study#########################:
 #http://docs.python.org/2/library/urllib2.html
 #http://www.cs.tut.fi/~jkorpela/http.html
@@ -47,10 +59,11 @@ url = "http://en.wikipedia.org/wiki/Mathematics"
 # Undesirable links:
 UNDESIRABLE_LINKS = [ 
 	'digital_object_identifier',
-	'/w/index.php?title=event_(' # These two are to exclude possible  
+	'/w/index.php?title=event_(', # These two are to exclude possible  
 	################################ direct self-referral since it creates
 	################################ an infinite loop while crawling the
 	################################ links referred in the html data.
+	'pubmed_identifier',
 	'//creativecommons.org/licenses/by-sa/3.0/',
 	'/wiki/category:wikipedia_articles_needing',
 	'/wiki/category:pages_containing_cite_templates',
@@ -144,6 +157,7 @@ UNDESIRABLE_LINKS = [
 	'/wiki/category:use_dmy_dates_from',
 	'/wiki/Digital_object_identifier',
 	'/wiki/Bibcode',
+	'_needing_style_editing', #/wiki/Category:All_articles_needing_style_editing 
 	]
 
 # Note that before checking this list, it must be ensured that the link
@@ -459,7 +473,13 @@ class Link(object):  #='NOPARENTLINK'  default parent?
 	
 
 	def get_page_title(self):
+		"""Get the title of a the URL pointed at actual_link by parsing the html file and 
+		reading what comes between first pair of <title> tags on the page.
+		Warning: The method must be used only for a parent (root) link, that is for a link
+		which was not extracted from the parsed html file of a parent link. In that case 
+		method extract_link_title() must be used.  
 
+		"""
 		self.set_html_data()  # Note here that html_data might have been parsed once before. 
 							  # Think of a way to avoid second time parsing the same page.
 
@@ -476,6 +496,9 @@ class Link(object):  #='NOPARENTLINK'  default parent?
 	def get_wikipedia_page_topic(self):
 		"""Remove ' - Wikipedia, the free encyclopedia' from page title if it is in 
 		page title, then return the result.
+		Warning: The method must be used only for a parent (root) link, that is for a link
+		which was not extracted from the parsed html file of a parent link. In that case 
+		method extract_link_title() must be used.  
 
 		"""
 		self.set_page_title()
@@ -498,9 +521,12 @@ class Link(object):  #='NOPARENTLINK'  default parent?
 		the link (end_link), and return the string starting from index after '"'
 		in 'title="' up to the next '"'.  
 
-		Note: This method gives wrong title (possibly title of the next tag) for 
+		Note 1: This method gives wrong title (possibly title of the next tag) for 
 		a given href if the link is not checked to give True with is_good_link()
-		method first.
+		method first. 
+		Note 2: In contrast with get_page_title() and get_wikipedia_page_topic() methods, 
+		wherein the html of the URL is parsed, this method reads the title of a link
+		from string data.  
 	
 		"""
 		title_start_index = data.find('title="', end_link) + 7
@@ -580,7 +606,7 @@ def get_links(data, given_url):
 
 	return [dic_section_anchor_links, dic_external_links, dic_wikipedia_non_en_links, dic_cite_numbers, dic_book_links, dic_wikipedia_en_links, dic_wikipedia_person_links, dic_wikipedia_template_or_category_links]    
 
-url = Link("http://en.wikipedia.org/wiki/Albert_Einstein")
+url = Link("http://en.wikipedia.org/wiki/Sadness")
 
 html_data = url.get_html()
 dics_list = get_links(html_data, url)
