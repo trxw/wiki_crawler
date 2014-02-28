@@ -4,6 +4,9 @@
 import urllib
 import urllib2
 from collections import Counter
+from pymongo import MongoClient
+import Storage
+from Bad_links import UNDESIRABLE_LINKS, TEMPLATE_OR_CATEGORY, FILES, BAD_EXTENTIONS, BOOK_SITE_LIST
 
 #######################System Setup:########################
 # Installing mongodb for python:
@@ -42,6 +45,8 @@ from collections import Counter
 # http://en.wikipedia.org/wiki/Category:Emotions
 # Now if we extract the graph of emotions from wikipedia, would we find some fundamental
 # emotions that all other emotions are connected to most frequently? 
+
+
 ########################### To study#########################:
 #http://docs.python.org/2/library/urllib2.html
 #http://www.cs.tut.fi/~jkorpela/http.html
@@ -51,182 +56,11 @@ from collections import Counter
 # Every website now has RESTful API - related to semantic web:
 # http://stackoverflow.com/questions/671118/what-exactly-is-restful-programming
 # Git good intro: http://git-scm.com/docs/gittutorial
+# Python unicode and pymongo: 
+# http://docs.python.org/2/howto/unicode.html and http://api.mongodb.org/python/current/tutorial.html
 
 
 
-#Set the parent link where crawling begins:
-url = "http://en.wikipedia.org/wiki/Mathematics"
-# Undesirable links:
-UNDESIRABLE_LINKS = [ 
-	'digital_object_identifier',
-	'/w/index.php?title=event_(', # These two are to exclude possible  
-	################################ direct self-referral since it creates
-	################################ an infinite loop while crawling the
-	################################ links referred in the html data.
-	'pubmed_identifier',
-	'//creativecommons.org/licenses/by-sa/3.0/',
-	'/wiki/category:wikipedia_articles_needing',
-	'/wiki/category:pages_containing_cite_templates',
-	'/wiki/category:featured_articles',
-	'/wiki/category:wikipedia_semi-protected_pages',
-	'//wikimediafoundation.org/wiki/privacy_policy',
-	'/wiki/main_page',
-	'//en.wikipedia.org/wiki/wikipedia:contact_us',
-	'/wiki/wikipedia:about',
-	'/wiki/help:',
-	'/wiki/help:',
-	'//shop.wikimedia.org',
-	'/wiki/special:recentchangeslinked',
-	'/wiki/special:booksources/',
-	'/wiki/wikipedia:community_portal',
-	'/wiki/wikipedia:community_portal',
-	'/wiki/category:all_articles_needing_additional_references',
-	'//meta.wikimedia.org',
-	'/wiki/category:all_articles_lacking_sources',
-	'//be-x-old.wikipedia.org/wiki/',
-	'//wikimediafoundation.org/wiki/terms_of_use',
-	'https://www.mediawiki.org/wiki/special:mylanguage/how_to_contribute',
-	'/wiki/Scientific_American',
-	'/wiki/Portal:',
-	'/wiki/Scientific_American',
-	'/wiki/portal:featured_content',
-	'/wiki/portal:current_events',
-	'/wiki/help:category',
-	'/wiki/file:question_book-new.svg',
-	'/wiki/wikipedia:file_upload_wizard',
-	'/w/index.php?title=special:recentchanges&amp;feed=atom',
-	'#p-search',
-	'#see_also',
-	'/wiki/special:random',
-	'/wiki/wikipedia:citing_sources',
-	'/wiki/special:recentchanges',
-	'//bits.wikimedia.org/apple-touch/wikipedia.png',
-	'/wiki/help:introduction_to_referencing/1',
-	'/wiki/category:articles_lacking_sources_from_july_2007',
-	'//en.wikipedia.org/w/api.php?action=rsd',
-	'//www.mediawiki.org/',
-	'/wiki/category:wikipedia_indefinitely_move-protected_pages',
-	'//en.wikipedia.org/wiki/wikipedia:',
-	'https://donate.wikimedia.org/wiki/special:',
-	'http://en.wikipedia.org/wiki/template_talk:',
-	'/wiki/template_talk:',
-	'/wiki/category:articles_with_open_directory_project_links',
-	'//en.wikipedia.org/w/index.php?title=template:',
-	'http://www.wikidata.org/wiki/',## Note that a link that begins with 
-	################################### this refers to the corresponding
-	################################### page in which the equivalent of 
-	################################### the title of the current page in 
-	################################### other languages are listed.
-	'//www.wikidata.org/wiki/',
-	'/wiki/special:specialpages',
-	'/wiki/talk:',
-	'//bits.wikimedia.org/en.wikipedia.org/load',
-	'/wiki/portal:contents',
-	'/w/opensearch_desc.php',
-	'//bits.wikimedia.org/favicon/wikipedia.ico',
-	'//bits.wikimedia.org',
-	'/w/index.php?title=special:book&',
-	'/wiki/special:whatlinkshere',
-	'/w/index.php?title=special:userlogin',
-	'/wiki/oxford_university_press',
-	'/wiki/wikipedia:',
-	'/wiki/especial:',
-	'/wiki/especial%',
-	'/wiki/spezial:',
-	'/wiki/spezial%',
-	'/wiki/special:',
-	'/wiki/special%',
-	'/wiki/wikipedia_diskussion:',
-	'/wiki/spesial:',
-	'/wiki/spesial%',
-	'/wiki/specjalna:',
-	'/wiki/specjalna%',
-	'/wiki/speciaal:',
-	'/wiki/speciaal%',
-	'/wiki/speciel:',
-	'/wiki/speciel%',
-	'/wiki/category:cs1_errors:_dates',
-	'/wiki/category:hidden_templates_using_styles',
-	'/wiki/category:wikipedia_indefinitely_semi-protected_pages',
-	'/wiki/category:all_articles_with_unsourced_statements',
-	'/wiki/category:articles_with_unsourced_statements',
-	'/wiki/book:',
-	'/w/index.php?title=',
-	'#mw-navigation',
-	'/wiki/category:articles_containing',
-	'/wiki/category:use_dmy_dates_from',
-	'/wiki/Digital_object_identifier',
-	'/wiki/Bibcode',
-	'_needing_style_editing', #/wiki/Category:All_articles_needing_style_editing 
-	]
-
-# Note that before checking this list, it must be ensured that the link
-# is not a bad link, that is it is not in either UNDESIRABLE_LINKS, FILES
-# or in BAD_EXTENTIONS.
-
-
-## IMPORTANT NOTE: This can in fact help a lot in determining important
-	##################### subcatagories of each field. For example, /wiki/Category:Mathematics
-	##################### has a subcaragory /wiki/Category:Fields_of_Mathematics 
-TEMPLATE_OR_CATEGORY = [
-	'/wiki/template:',
-	'/wiki/category:', 
-	'/template:', 
-	]
-
-FILES = [
-	'/wiki/file:',
-	'.jpg',
-#	'.JPG', 
-	'.png',
-#	'.PNG', 
-	'.pdf',
-#	'.PDF',
-	'.svg',
-	]	
-
-BAD_EXTENTIONS = [
-	'edit',
-	'printable=yes',
-	'#sitelinks-wikipedia',
-	'#mw-navigation',
-	'wikipedia:general_disclaimer',
-	'&amp;action=info',
-	'skin=vector&amp;*',
-	'&amp;writer=rl',
-	'#external_links',
-	'#p-search',
-	'#a_note_on_notation',
-	'#external_links',
-	'#notes',
-	'#see_also',
-	'/wiki/inverse_image',
-	'/w/index.',
-	'wikipedia.',
-	'wikipedia.',
-	'wikipedia',
-	'/ka.wikipedia.',
-	'pedia.',
-	'wikimediafoundation.org/',
-	'wikimediafoundation.org',
-	'/wiki/springer_science%2bbusiness_media',
-	'http://en.wikipedia.org/wiki/OCLC',
-	'//en.wikipedia.org/wiki/OCLC',
-	#'mwl',  	
-	#'vec',
-	#'csb'
-	#'zea'
-	#'bat-smg'
-	'/wiki/international_standard_book_number',
-	'education.aspx',
-	'/w/',
-	'/trap/',
-	]
-
-BOOK_SITE_LIST = [
-	"books.google.com/",
-	"www.amazon.",
-	]
 
 
 
@@ -303,6 +137,8 @@ class Link(object):  #='NOPARENTLINK'  default parent?
 		self.html_data = ""
 		self.page_title = ""
 		self.page_topic = ""
+		self.link_title = ""  # This is a string representing the title of a link found in the 
+							  # parent link parsed html file and is in UTF-8 encoding.
 
 	def get_link(self):
 		return self.link 
@@ -534,6 +370,13 @@ class Link(object):  #='NOPARENTLINK'  default parent?
 			title_last_index = data.find('"',title_start_index) - 1
 			return data[title_start_index : title_last_index + 1]
 
+	def set_link_title(self, data, end_link):
+		"""Set a title of the link extracted from data (string) starting from 
+		end_link (integer)
+
+		"""
+		self.link_title = extract_link_title(data, end_link)
+
 	def store(self, dic_section_anchor_links,
 		dic_external_links,
 		dic_cite_numbers,
@@ -575,69 +418,81 @@ class Link(object):  #='NOPARENTLINK'  default parent?
 
 		return [dic_section_anchor_links, dic_external_links, dic_wikipedia_non_en_links, dic_cite_numbers, dic_book_links, dic_wikipedia_en_links, dic_wikipedia_person_links, dic_wikipedia_template_or_category_links]    
 
+	def get_links(self):
+		data = self.get_html()
+		given_url = self.get_actual_link() 
+		url = str(given_url)
+		end_link = 0
+		#li=[]
+		link_count = 0
+		start_link = 0
+		dic_section_anchor_links = {}
+		dic_external_links = {}
+		dic_cite_numbers = {}
+		dic_wikipedia_non_en_links = {}
+		dic_book_links = {}
+		dic_wikipedia_en_links = {}
+		dic_wikipedia_person_links = {}
+		dic_wikipedia_template_or_category_links = {}
 
+		#test_link = Link('/wiki/template:')
+
+		while start_link != -1:
+			
+			# Note that getStart_link() and getEnd_link will both return -1 
+			# if there are no more hrefs:
+			start_link = get_start_link(data, end_link) 
+			end_link = get_end_link(data, start_link)
+		
+			if start_link != -1:
+				link_count += 1
+				## Extract the link as string:      
+				if end_link != -1:
+					current_link = Link(extract_link(data, start_link, end_link), url)
+					current_link_title = Link.extract_link_title(data, end_link)
+					current_link.store(
+						dic_section_anchor_links,
+						dic_external_links,
+						dic_cite_numbers,
+						dic_wikipedia_non_en_links,
+						dic_book_links,
+						dic_wikipedia_en_links,
+						dic_wikipedia_person_links,
+						dic_wikipedia_template_or_category_links)		
+					
+
+		return [dic_section_anchor_links,
+			dic_external_links,
+			dic_cite_numbers,
+			dic_wikipedia_non_en_links,
+			dic_book_links,
+			dic_wikipedia_en_links,
+			dic_wikipedia_person_links,
+			dic_wikipedia_template_or_category_links,
+			] 
 
 	def __repr__(self):
 		return self.get_link()
 
 
-def get_links(data, given_url):
-	url = str(given_url)
-	end_link = 0
-	#li=[]
-	link_count = 0
-	start_link = 0
-	dic_section_anchor_links = {}
-	dic_external_links = {}
-	dic_cite_numbers = {}
-	dic_wikipedia_non_en_links = {}
-	dic_book_links = {}
-	dic_wikipedia_en_links = {}
-	dic_wikipedia_person_links = {}
-	dic_wikipedia_template_or_category_links = {}
-
-	#test_link = Link('/wiki/template:')
-
-	while start_link != -1:
-		
-		# Note that getStart_link() and getEnd_link will both return -1 
-		# if there are no more hrefs:
-		start_link = get_start_link(data, end_link) 
-		end_link = get_end_link(data, start_link)
-	
-		if start_link != -1:
-			link_count += 1
-			## Extract the link as string:      
-			if end_link != -1:
-				current_link = Link(extract_link(data, start_link, end_link), url)
-				current_link_title = Link.extract_link_title(data, end_link)
-				current_link.store(
-					dic_section_anchor_links,
-					dic_external_links,
-					dic_cite_numbers,
-					dic_wikipedia_non_en_links,
-					dic_book_links,
-					dic_wikipedia_en_links,
-					dic_wikipedia_person_links,
-					dic_wikipedia_template_or_category_links)		
-				
-
-	return [dic_section_anchor_links,
-				dic_external_links,
-				dic_cite_numbers,
-				dic_wikipedia_non_en_links,
-				dic_book_links,
-				dic_wikipedia_en_links,
-				dic_wikipedia_person_links,
-				dic_wikipedia_template_or_category_links,
-			] 
 
 
+#########################################################################
+
+# def printfile():
+
+
+
+
+
+
+#########################################################################
+################################Test#####################################
 
 url = Link("http://en.wikipedia.org/wiki/Sadness")
 
-html_data = url.get_html()
-dics_list = get_links(html_data, url)
+#html_data = url.get_html()
+dics_list = url.get_links()
 
 print url.get_wikipedia_page_topic() + "\n"
 
