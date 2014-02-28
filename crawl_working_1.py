@@ -421,6 +421,37 @@ class Link(object):  #='NOPARENTLINK'  default parent?
 
 		return [dic_section_anchor_links, dic_external_links, dic_wikipedia_non_en_links, dic_cite_numbers, dic_book_links, dic_wikipedia_en_links, dic_wikipedia_person_links, dic_wikipedia_template_or_category_links]    
 
+
+	def identify(self):
+		if self.is_good_link(): #len(self.get_actual_link()) > 2:
+			if self.is_wikipedia_en_link():     
+				if self.is_wikipedia_template_or_category_link():
+					return 'wikipedia_template_or_category_link'
+   					#
+   					#elif self.is_wikipedia_person():
+					#	store_link_count(dic_wikipedia_person_links, self)
+					#
+				else:
+   					return 'wikipedia_en_link'					
+
+			elif self.is_wikipedia_non_en_link():
+				return 'wikipedia_non_en_link'
+
+			elif self.is_anchor_tag():
+				if self.is_cite_number():
+					return 'cite_number'
+				else: 
+					return 'section_anchor_link'  
+						
+			elif self.is_book_link():
+					return 'book_link'
+
+			else:                           
+				return 'external_link'
+	
+	
+
+
 	def get_links(self):
 		"""Get all the appropriate links that are referred to in the parsed html of the original url 
 		of the Link instance.
