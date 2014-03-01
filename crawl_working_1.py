@@ -18,7 +18,8 @@ from Bad_links import UNDESIRABLE_LINKS, TEMPLATE_OR_CATEGORY, FILES, BAD_EXTENT
 
 #How python will count the number of charactes in a link if 
 #they are in URL encoding format? I have to count in a couple of 
-#the methods in this crawler.
+#the methods in this crawler.  ---> Resolved. Only number of strings 
+# in the actual_link, which is in UTF-8 format is counted.
 
 
 ##################For further development####################:
@@ -142,6 +143,7 @@ class Link(object):  #='NOPARENTLINK'  default parent?
 		self.page_topic = ""
 		self.link_title = ""  # This is a string representing the title of a link found in the 
 							  # parent link parsed html file and is in UTF-8 encoding.
+		self.pointer = 0
 
 	def get_link(self):
 		return self.link 
@@ -393,10 +395,10 @@ class Link(object):  #='NOPARENTLINK'  default parent?
 			if self.is_wikipedia_en_link():     
 				if self.is_wikipedia_template_or_category_link():
 					store_link_count(dic_wikipedia_template_or_category_links, self)
-   					#
-   					#elif self.is_wikipedia_person():
-					#	store_link_count(dic_wikipedia_person_links, self)
-					#
+   					
+   				elif self.is_wikipedia_person():
+					store_link_count(dic_wikipedia_person_links, self)
+					
 				else:
    					store_link_count(dic_wikipedia_en_links, self)
 					
@@ -442,14 +444,18 @@ class Link(object):  #='NOPARENTLINK'  default parent?
 					return 'cite_number'
 				else: 
 					return 'section_anchor_link'  
-						
+
 			elif self.is_book_link():
 					return 'book_link'
 
 			else:                           
 				return 'external_link'
+		else: 
+			return 'bad_link'
+
 	
-	
+#	def get_next_link(self):
+
 
 
 	def get_links(self):
@@ -527,7 +533,7 @@ class Link(object):  #='NOPARENTLINK'  default parent?
 #########################################################################
 ################################Test#####################################
 
-url = Link("http://en.wikipedia.org/wiki/Category:Living_people")
+url = Link("http://en.wikipedia.org/wiki/Albert_Einstein")
 
 #html_data = url.get_html()
 dics_list = url.get_links()
@@ -541,8 +547,6 @@ for i in range(len(dics_list)):
 print "There are "+str(len(dics_list[1])) + " unique external links on the page."
 
 
-t = sort_dic(dics_list[5])
-
 f = open(url.get_actual_link()[url.get_actual_link().find('wiki/')+5 : ]+".txt", "w")
 
 wikipedia_links_sorted = sort_dic(dics_list[5])
@@ -555,17 +559,18 @@ for i in range(len(wikipedia_links_sorted)):
 #for k in dics_list[5]:
 #   f.write(str(k) + " : " + str(dics_list[5][k]) + "\n")    
 
-q = sort_dic(dics_list[6])
-f.write("\n\n\n\n\n\n")
+dics_list[6] = sort_dic(dics_list[6])
 f.write("Ranked dic_wikipedia_person_links are: \n")  
-for j in range(len(q)):
-	f.write(str(q[j][0]) + " : " + str(q[j][1]) + "\n")    
+for item in dics_list[6]:
+	f.write(str(item[0]) + " : " + str(item[1]) + "\n")    
+
 
 
 
 f.write("\n\n\n\n\n\n")
 
 ## Write the dic_external_links:
+t = sort_dic(dics_list[5])
 f.write("Ranked dic_wikipedia_en_links are: \n") 
 for i in range(len(t)):
 	f.write(str(t[i][0]) + " : " + str(t[i][1]) + "\n")

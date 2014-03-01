@@ -10,6 +10,7 @@ UNDESIRABLE_LINKS = [
 	################################ an infinite loop while crawling the
 	################################ links referred in the html data.
 	'pubmed_identifier',
+	'/wiki/bibcode',
 	'//creativecommons.org/licenses/by-sa/3.0/',
 	'/wiki/category:wikipedia_articles_needing',
 	'/wiki/category:pages_containing_cite_templates',
@@ -104,6 +105,7 @@ UNDESIRABLE_LINKS = [
 	'/wiki/Digital_object_identifier',
 	'/wiki/Bibcode',
 	'_needing_style_editing', #/wiki/Category:All_articles_needing_style_editing 
+
 	]
 
 # Note that before checking this list, it must be ensured that the link
