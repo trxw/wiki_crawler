@@ -5,11 +5,6 @@ import urllib
 import urllib2
 from collections import Counter
 
-######################Uresolved:############################
-
-#How python will count the number of charactes in a link if 
-#they are in URL encoding format? I have to count in a couple of 
-#the methods in this crawler.
 
 
 ##################For further development####################:
