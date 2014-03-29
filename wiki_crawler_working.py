@@ -25,19 +25,11 @@ from collections import Counter
 # http://docs.python-requests.org/en/latest/
 # For requests also see:
 # http://stackoverflow.com/questions/10342694/sending-requests-to-webpages-using-pythons-urllib2
-# How to log into a website using python:
+# Log into with python:
 # http://stackoverflow.com/questions/189555/how-to-use-python-to-login-to-a-webpage-and-retrieve-cookies-for-later-usage
-# How to avoid non html content in http request:
+# Avoid non html content in request:
 # http://stackoverflow.com/questions/8479736/using-python-urllib-how-to-avoid-non-html-content
 
-########################### To study#########################:
-#http://docs.python.org/2/library/urllib2.html
-#http://www.cs.tut.fi/~jkorpela/http.html
-#http://json.org/
-# Comparison of different html parsers in python: 
-# http://www.crummy.com/software/BeautifulSoup/bs4/doc/#installing-a-parser
-# Every website now has RESTful API - related to semantic web:
-# http://stackoverflow.com/questions/671118/what-exactly-is-restful-programming
 
 
 
