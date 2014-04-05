@@ -9,8 +9,96 @@ from LinkStorage import UNDESIRABLE_LINKS, TEMPLATE_OR_CATEGORY, FILES, BAD_EXTE
 
 
 #Set the parent link where crawling begins:
-url = "http://en.wikipedia.org/wiki/Mathematics"
+url_str = "http://en.wikipedia.org/wiki/Mathematics"
 # Undesirable links:
+
+
+def main():
+  
+  url = Link(url_str)
+  
+  # html_data = url.get_html()
+  dics_list = get_links(url)
+  
+  print url.get_wikipedia_page_topic() + "\n"
+  
+  for i in range(len(dics_list)):
+    print "There are " + str(len(dics_list[i])) + " links.\n"
+  
+  
+  print "There are "+str(len(dics_list[1])) + " unique external links on the page."
+  
+  
+  t = sort_dic(dics_list[5])
+  
+  f = open(url.get_actual_link()[url.get_actual_link().find('wiki/')+5 : ]+".txt", "w")
+  
+  wikipedia_links_sorted = sort_dic(dics_list[5])
+  number_of_wikipedia_links = len(wikipedia_links_sorted)
+  f.write("There are " + str(number_of_wikipedia_links) + " links in dic_wikipedia_links: \n") 
+  
+  for i in range(len(wikipedia_links_sorted)):
+    f.write(str(wikipedia_links_sorted[i][0]) + " : " + str(wikipedia_links_sorted[i][1]) + "\n")   
+  
+  #for k in dics_list[5]:
+  #   f.write(str(k) + " : " + str(dics_list[5][k]) + "\n")    
+  
+  q = sort_dic(dics_list[6])
+  f.write("\n\n\n\n\n\n")
+  f.write("Ranked dic_wikipedia_person_links are: \n")  
+  for j in range(len(q)):
+    f.write(str(q[j][0]) + " : " + str(q[j][1]) + "\n")    
+  
+  
+  
+  f.write("\n\n\n\n\n\n")
+  
+  ## Write the dic_external_links:
+  f.write("Ranked dic_wikipedia_links are: \n") 
+  for i in range(len(t)):
+    f.write(str(t[i][0]) + " : " + str(t[i][1]) + "\n")
+  
+  f.write("\n\n\n\n\n\n")
+  
+  f.write("dic_internal_links are: \n") 
+  for j in dics_list[0]:
+    f.write(str(j) + " : " + str(dics_list[0][j]) + "\n")    
+  
+  f.write("\n\n\n\n\n\n")
+  
+  f.write("dic_wikipedia_non_en_links are: \n")    
+  for k in dics_list[2]:
+    f.write(str(k) + " : " + str(dics_list[2][k]) + "\n")    
+  
+  f.write("\n\n\n\n\n\n")
+  
+  f.write("dic_cite_numbers are: \n")   
+  for k in dics_list[3]:
+    f.write(str(k) + " : " + str(dics_list[3][k]) + "\n")    
+  
+  f.write("\n\n\n\n\n\n")
+  
+  f.write("dic_book_links are: \n") 
+  for k in dics_list[4]:
+    f.write(str(k) + " : " + str(dics_list[4][k]) + "\n")    
+  
+  f.write("\n\n\n\n\n\n")
+  
+  f.write("dic_wikipedia_template_or_category_links are: \n") 
+  for k in dics_list[7]:
+    f.write(str(k) + " : " + str(dics_list[7][k]) + "\n")    
+  
+  
+  f.close() 
+  
+  print "\n"
+  print len(dics_list[7])
+
+
+
+
+
+
 
 
 def extract_link(data, start_link, end_link):
@@ -286,95 +374,9 @@ class Link(object):  #='NOPARENTLINK'  default parent?
   
   
 
-def main():
-  
-  url = Link("http://en.wikipedia.org/wiki/Albert_Einstein")
-  
-  # html_data = url.get_html()
-  dics_list = get_links(url)
-  
-  print url.get_wikipedia_page_topic() + "\n"
-  
-  for i in range(len(dics_list)):
-    print "There are " + str(len(dics_list[i])) + " links.\n"
-  
-  
-  print "There are "+str(len(dics_list[1])) + " unique external links on the page."
-  
-  
-  t = sort_dic(dics_list[5])
-  
-  f = open(url.get_actual_link()[url.get_actual_link().find('wiki/')+5 : ]+".txt", "w")
-  
-  wikipedia_links_sorted = sort_dic(dics_list[5])
-  number_of_wikipedia_links = len(wikipedia_links_sorted)
-  f.write("There are " + str(number_of_wikipedia_links) + " links in dic_wikipedia_links: \n") 
-  
-  for i in range(len(wikipedia_links_sorted)):
-    f.write(str(wikipedia_links_sorted[i][0]) + " : " + str(wikipedia_links_sorted[i][1]) + "\n")   
-  
-  #for k in dics_list[5]:
-  #   f.write(str(k) + " : " + str(dics_list[5][k]) + "\n")    
-  
-  q = sort_dic(dics_list[6])
-  f.write("\n\n\n\n\n\n")
-  f.write("Ranked dic_wikipedia_person_links are: \n")  
-  for j in range(len(q)):
-    f.write(str(q[j][0]) + " : " + str(q[j][1]) + "\n")    
-  
-  
-  
-  f.write("\n\n\n\n\n\n")
-  
-  ## Write the dic_external_links:
-  f.write("Ranked dic_wikipedia_links are: \n") 
-  for i in range(len(t)):
-    f.write(str(t[i][0]) + " : " + str(t[i][1]) + "\n")
-  
-  f.write("\n\n\n\n\n\n")
-  
-  f.write("dic_internal_links are: \n") 
-  for j in dics_list[0]:
-    f.write(str(j) + " : " + str(dics_list[0][j]) + "\n")    
-  
-  f.write("\n\n\n\n\n\n")
-  
-  f.write("dic_wikipedia_non_en_links are: \n")    
-  for k in dics_list[2]:
-    f.write(str(k) + " : " + str(dics_list[2][k]) + "\n")    
-  
-  f.write("\n\n\n\n\n\n")
-  
-  f.write("dic_cite_numbers are: \n")   
-  for k in dics_list[3]:
-    f.write(str(k) + " : " + str(dics_list[3][k]) + "\n")    
-  
-  f.write("\n\n\n\n\n\n")
-  
-  f.write("dic_book_links are: \n") 
-  for k in dics_list[4]:
-    f.write(str(k) + " : " + str(dics_list[4][k]) + "\n")    
-  
-  f.write("\n\n\n\n\n\n")
-  
-  f.write("dic_wikipedia_template_or_category_links are: \n") 
-  for k in dics_list[7]:
-    f.write(str(k) + " : " + str(dics_list[7][k]) + "\n")    
-  
-  
-  f.close() 
-  
-  print "\n"
-  print len(dics_list[7])
-
-
 
 def get_links(url):
     
-  #url = str(given_url)
- 	# url = "http://en.wikipedia.org/wiki/Adolf_Hitler" 
-	# end_link = 0
-	#li=[]
 	dic_internal_links = {}
 	dic_external_links = {}
 	dic_cite_numbers = {}
@@ -383,28 +385,8 @@ def get_links(url):
 	dic_wikipedia_links = {}
 	dic_wikipedia_person_links = {}
 	dic_wikipedia_template_or_category_links = {}
-	#link_count = 0
-	#start_link = 0
 
-	#test_link = Link('/wiki/template:')
 	for current_link in link_gen(url):
-    #	while start_link != -1:
-		
-		# Note that getStart_link() and getEnd_link will both return -1 
-		# if there are no more hrefs:
-		#start_link = get_start_link(data, end_link) 
-		#end_link = get_end_link(data, start_link)
-	
-		#if start_link != -1:
-		#	link_count += 1
-			## Extract the link as string:      
-		#	current_link = Link(extract_link(data, start_link, end_link), url)
-		#current_link = link  		
-			## and Store the extracted link inside list li:     
-			#   li.append(current_link)
-
-			## and Store the extracted link inside dictionary dic, and add 1 to the number of 
-			## occurrence of the link:
 		if current_link.is_good_link(): #len(current_link.get_actual_link()) > 2:
 			if current_link.is_wikipedia_link():     
 				if current_link.is_wikipedia_template_or_category_link():
@@ -441,6 +423,7 @@ def link_gen(url):
 		yield Link(html[start+6:end], url)
 		start = html.find('href="', end)
 		end = html.find('"', start+6 )
+
 
 if __name__ == "__main__": main()
 
